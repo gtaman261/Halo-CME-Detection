@@ -38,26 +38,26 @@ Sudden changes in solar wind particle flux can indicate CME activity. Early dete
 
 ## 📁 Project Structure
 
+```
 Halo-CME-Detection/
-├── data/
-│ ├── cactus/ # CACTus Halo CME catalog
-│ ├── raw_cdf/ # Original CDF files
-│ ├── swis_csv/ # Converted CSVs
-│ ├── final_dataset.csv # Cleaned and merged dataset
-│ └── detected_halo_cmes.csv # Final detection output
-├── plots/ # Generated visualizations
+├── Data/
+│   └── AL1_ASW91_L2_TH1_20250628_UNP_9999_999999_V02.cdf   # Example CDF data file
 ├── scripts/
-│ ├── cdf_to_csv.py
-│ ├── data_preparation.py
-│ ├── halo_cme_detection.py
-│ └── visualization.py
-├── .gitignore
-└── README.md
+│   ├── cdf_to_csv.py           # Converts CDF files to CSV
+│   ├── data_preparation.py     # Cleans and merges CSVs into final dataset
+│   ├── halo_cme_detection.py   # Main detection pipeline
+│   └── visualization.py        # Plotting and analysis scripts
+├── main.py                     # (Optional) Entrypoint for running the pipeline
+├── requirements.txt            # Python dependencies
+├── README.md                   # Project documentation
+```
 
-yaml
-Copy
+**Directory Notes:**
+- `Data/` contains raw CDF files and any processed data outputs.
+- `scripts/` holds all main processing and analysis scripts.
+- `plots/` (if present) will contain generated visualizations.
+- Output CSVs (e.g., `final_dataset.csv`, `detected_halo_cmes.csv`) are saved in the appropriate data folders.
 Edit
-
 ---
 
 ## 🛠️ How to Run
@@ -66,78 +66,103 @@ Edit
 
 ```bash
 pip install -r requirements.txt
-2️⃣ Convert CDF to CSV
-bash
-Copy
-Edit
+```
+
+### 2️⃣ Convert CDF to CSV
+
+```bash
 python scripts/cdf_to_csv.py
-3️⃣ Merge & Prepare Final Dataset
-bash
-Copy
-Edit
+```
+
+### 3️⃣ Merge & Prepare Final Dataset
+
+```bash
 python scripts/data_preparation.py
-4️⃣ Run CME Detection
-bash
-Copy
-Edit
+```
+
+### 4️⃣ Run CME Detection
+
+```bash
 python scripts/halo_cme_detection.py
-5️⃣ Generate Visual Plots
-bash
-Copy
-Edit
+```
+
+### 5️⃣ Generate Visual Plots
+
+```bash
 python scripts/visualization.py
-📊 Visual Outputs
-All plots are saved in the plots/ directory:
+```
 
-*_overlay.png: Composite Score with CACTus intervals
+---
 
-*_overlay_with_detected.png: CACTus (orange) vs Detected events (green)
+## 📊 Output & Visualization
 
-cme_strength_distribution.png: Histogram of CME strengths (Weak/Moderate/Strong)
+- All plots are saved in the `plots/` directory:
+  - `*_overlay.png`: Composite Score with CACTus intervals
+  - `*_overlay_with_detected.png`: CACTus (orange) vs Detected events (green)
+  - `cme_strength_distribution.png`: Histogram of CME strengths (Weak/Moderate/Strong)
 
-Example:
+**Example:**
 
 <p align="center"> <img src="plots/cme_strength_distribution.png" alt="CME Strength Histogram" width="600"/> </p>
-✅ Final Output
-📄 detected_halo_cmes.csv: List of detected CME intervals with strength classification
 
-📊 Per-event plots to support interpretation
+---
 
-🧠 Algorithmic detection based on dynamic particle variations
+## ✅ Final Output
 
-🚀 Highlights
-✅ Data-driven, India-centric space solution
+- 📄 `detected_halo_cmes.csv`: List of detected CME intervals with strength classification
+- 📊 Per-event plots to support interpretation
+- 🧠 Algorithmic detection based on dynamic particle variations
 
-🧩 Adaptive z-score thresholding for robust anomaly detection
+---
 
-🔄 Merging logic to prevent over-fragmentation of events
+## 🚀 Highlights
 
-⚙️ Fully scriptable and reproducible workflow
+- ✅ Data-driven, India-centric space solution
+- 🧩 Adaptive z-score thresholding for robust anomaly detection
+- 🔄 Merging logic to prevent over-fragmentation of events
+- ⚙️ Fully scriptable and reproducible workflow
+- 📊 Rich visual and statistical outputs for analysis
 
-📊 Rich visual and statistical outputs for analysis
+---
 
-🧰 Tools & Libraries Used
-pandas, numpy
+## 🧰 Tools & Libraries Used
 
-matplotlib, seaborn
+- pandas, numpy
+- matplotlib, seaborn
+- spacepy (for reading CDF files)
+- scipy, tqdm
 
-spacepy (for reading CDF files)
+---
 
-scipy, tqdm
+## 📬 Acknowledgements
 
-📬 Acknowledgements
-ISRO Aditya-L1 Mission & SWIS-ASPEX Team
+- ISRO Aditya-L1 Mission & SWIS-ASPEX Team
+- SIDC/CACTus for providing the Halo CME catalog
+- Bharat Antriksh Hackathon by ISRO & iHUB DivyaSampark
 
-SIDC/CACTus for providing the Halo CME catalog
+---
 
-Bharat Antriksh Hackathon by ISRO & iHUB DivyaSampark
+## � Project Structure
 
-📈 Future Improvements
-Add velocity vector direction change analysis
+```
+Halo-CME-Detection/
+├── Data/
+│   └── AL1_ASW91_L2_TH1_20250628_UNP_9999_999999_V02.cdf
+├── scripts/
+│   ├── cdf_to_csv.py
+│   ├── data_preparation.py
+│   ├── halo_cme_detection.py
+│   └── visualization.py
+├── main.py
+├── requirements.txt
+├── README.md
+```
 
-Integrate real-time streaming data support
+---
 
-Develop a web-based dashboard or alert system
-
-Explore machine learning-based trend modeling
+�📈 Future Improvements
+- Add velocity vector direction change analysis
+- Integrate real-time streaming data support
+- Develop a web-based dashboard or alert system
+- Explore machine learning-based trend modeling
 
