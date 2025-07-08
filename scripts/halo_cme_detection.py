@@ -1,4 +1,4 @@
-# Updated Detection Script (halo_cme_detection.py) with Enhanced Sensitivity, Merging, Filtering, and Categorization
+# Updated Detection Script (halo_cme_detection.py) with Confidence, Strength Refinement, and Deduplication
 
 import pandas as pd
 import numpy as np
@@ -10,12 +10,10 @@ swis_data = pd.read_csv('../data/final_dataset.csv', parse_dates=['Time'])
 catalog = pd.read_csv('../data/cactus/halo_cmes.csv', parse_dates=['Launch_Time', 'Expected_Start', 'Expected_End'])
 
 # Set parameters
-MIN_DURATION = timedelta(minutes=30)
-ROLLING_WINDOW = 15  # smaller to capture finer variation
+ROLLING_WINDOW = 15
 PERCENTILE_THRESHOLD = 90
 COMPOSITE_THRESHOLD_MIN = 2.0
-NOISE_SCORE_MIN = 10.0  # Minimum composite score average for filtering weak bursts
-MERGE_GAP = timedelta(minutes=10)  # Merge intervals closer than this
+MERGE_GAP = timedelta(minutes=10)
 debug_dir = '../data/debug_scores'
 os.makedirs(debug_dir, exist_ok=True)
 
@@ -43,7 +41,7 @@ for _, row in catalog.iterrows():
     cme_end = row['Expected_End']
     window_start = cme_start - timedelta(hours=48)
     window_end = cme_end + timedelta(hours=48)
-    
+
     data_window = swis_data[(swis_data['Time'] >= window_start) & (swis_data['Time'] <= window_end)].copy()
     if data_window.empty:
         print("⚠️ No SWIS data found in this window.")
@@ -61,18 +59,29 @@ for _, row in catalog.iterrows():
         data_window[f'{param}_std'] = data_window[f'{param}_std'].replace(0, 1e-6)
 
         z_scores = (data_window[param] - data_window[f'{param}_mean']) / data_window[f'{param}_std']
-        z_scores = z_scores.clip(lower=0)
+        z_scores = z_scores.clip(lower=0, upper=10)
 
         adaptive_threshold = max(COMPOSITE_THRESHOLD_MIN, np.percentile(z_scores.dropna(), PERCENTILE_THRESHOLD))
         score_contrib = weights[param] * (z_scores > adaptive_threshold) * z_scores
         composite_score += score_contrib.fillna(0)
 
     data_window['Composite_Score'] = composite_score
-
-    # Save debug
     data_window[['Time', 'Composite_Score']].to_csv(os.path.join(debug_dir, f"CME_{row['CME_Number']}_scores.csv"), index=False)
 
-    threshold = np.percentile(composite_score.dropna(), PERCENTILE_THRESHOLD)
+    nonzero_scores = composite_score[composite_score > 0]
+    max_score = composite_score.max()
+
+    if not nonzero_scores.empty:
+        threshold = np.percentile(nonzero_scores, PERCENTILE_THRESHOLD)
+        if threshold > 0.6 * max_score:
+            print(f"⚠️ Threshold {threshold:.2f} too high relative to max {max_score:.2f}. Lowering for sensitivity.")
+            threshold = max(COMPOSITE_THRESHOLD_MIN, max_score * 0.3)
+    else:
+        threshold = COMPOSITE_THRESHOLD_MIN
+
+    NOISE_SCORE_MIN = max(3.0, threshold * 0.4)
+    MIN_DURATION = timedelta(minutes=2)
+
     print(f"\n📊 Composite Score Summary for CME {row['CME_Number']}")
     print(data_window['Composite_Score'].describe())
     print(f"🎯 {PERCENTILE_THRESHOLD}th Percentile Threshold: {threshold:.2f}")
@@ -89,11 +98,12 @@ for _, row in catalog.iterrows():
         end_time = group_df['Time'].iloc[-1]
         duration = end_time - start_time
         avg_score = group_df['Composite_Score'].mean()
+        peak_score = group_df['Composite_Score'].max()
 
-        if avg_score >= NOISE_SCORE_MIN:
-            candidate_events.append((start_time, end_time, avg_score))
+        if avg_score >= NOISE_SCORE_MIN and duration >= MIN_DURATION:
+            confidence = round((avg_score / max_score) * 100, 1) if max_score > 0 else 0.0
+            candidate_events.append((start_time, end_time, avg_score, peak_score, duration.total_seconds() / 60, confidence))
 
-    # Merge nearby intervals
     merged_events = []
     for event in sorted(candidate_events):
         if not merged_events:
@@ -103,16 +113,18 @@ for _, row in catalog.iterrows():
             if event[0] - last[1] <= MERGE_GAP:
                 last[1] = event[1]
                 last[2] = max(last[2], event[2])
+                last[3] = max(last[3], event[3])
+                last[4] += event[4]
+                last[5] = max(last[5], event[5])
             else:
                 merged_events.append(list(event))
 
     if merged_events:
         print(f"✅ Detected {len(merged_events)} merged event(s) in this window.")
-        for start, end, score in merged_events:
-            # Categorize CME strength
-            if score > 100:
+        for start, end, score, peak, duration_mins, confidence in merged_events:
+            if peak > 100 or score > 80:
                 strength = "Strong"
-            elif score > 30:
+            elif peak > 40 or score > 30:
                 strength = "Moderate"
             else:
                 strength = "Weak"
@@ -122,17 +134,23 @@ for _, row in catalog.iterrows():
                 'Detected_Start': start,
                 'Detected_End': end,
                 'Avg_Score': round(score, 2),
+                'Peak_Score': round(peak, 2),
+                'Duration_mins': round(duration_mins, 2),
+                'Confidence': f"{confidence}%",
                 'Strength': strength
             })
     else:
         print("⚠️ No Halo CME detected in this window.")
 
-# Save results
 if detected_events:
     detected_df = pd.DataFrame(detected_events)
+    detected_df.drop_duplicates(subset=['Detected_Start', 'Detected_End'], inplace=True)
     detected_df.to_csv('../data/detected_halo_cmes.csv', index=False)
     print("\n🎯 Detection completed. Results saved to '../data/detected_halo_cmes.csv'.")
 else:
     print("\n⚠️ No Halo CME detected in the dataset.")
 
 print("\n✅ Detection completed.")
+
+
+
