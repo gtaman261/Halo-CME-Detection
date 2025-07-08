@@ -1,4 +1,4 @@
-# Updated Detection Script (halo_cme_detection.py) with Confidence, Strength Refinement, and Deduplication
+# Updated Detection Script (halo_cme_detection.py) with Confidence, Strength Refinement, Deduplication, and CACTus Validation
 
 import pandas as pd
 import numpy as np
@@ -33,6 +33,7 @@ weights = {
 params = list(weights.keys())
 print("\n🚀 Starting Halo CME Detection...\n")
 detected_events = []
+detected_cme_ids = set()
 
 for _, row in catalog.iterrows():
     print(f"🔍 Processing CME {row['CME_Number']}...")
@@ -129,6 +130,7 @@ for _, row in catalog.iterrows():
             else:
                 strength = "Weak"
 
+            valid = 'TP' if (end >= row['Expected_Start']) and (start <= row['Expected_End']) else 'FP'
             detected_events.append({
                 'CME_Number': row['CME_Number'],
                 'Detected_Start': start,
@@ -137,20 +139,42 @@ for _, row in catalog.iterrows():
                 'Peak_Score': round(peak, 2),
                 'Duration_mins': round(duration_mins, 2),
                 'Confidence': f"{confidence}%",
-                'Strength': strength
+                'Strength': strength,
+                'Validation': valid
             })
     else:
         print("⚠️ No Halo CME detected in this window.")
 
+# Evaluation metrics
+TP = sum(1 for e in detected_events if e['Validation'] == 'TP')
+FP = sum(1 for e in detected_events if e['Validation'] == 'FP')
+FN = 0
+for _, row in catalog.iterrows():
+    overlaps = any((e['Detected_End'] >= row['Expected_Start']) and (e['Detected_Start'] <= row['Expected_End']) for e in detected_events)
+    if not overlaps:
+        FN += 1
+
+precision = TP / (TP + FP) if TP + FP > 0 else 0
+recall = TP / (TP + FN) if TP + FN > 0 else 0
+f1_score = 2 * (precision * recall) / (precision + recall) if precision + recall > 0 else 0
+
+# Save outputs
 if detected_events:
     detected_df = pd.DataFrame(detected_events)
     detected_df.drop_duplicates(subset=['Detected_Start', 'Detected_End'], inplace=True)
     detected_df.to_csv('../data/detected_halo_cmes.csv', index=False)
+
+    with open('../data/evaluation_metrics.txt', 'w') as f:
+        f.write("Precision: {:.2f}\n".format(precision))
+        f.write("Recall: {:.2f}\n".format(recall))
+        f.write("F1 Score: {:.2f}\n".format(f1_score))
+        f.write("True Positives: {}\n".format(TP))
+        f.write("False Positives: {}\n".format(FP))
+        f.write("False Negatives: {}\n".format(FN))
+
+    print("\n📁 Evaluation metrics saved to '../data/evaluation_metrics.txt'.")
     print("\n🎯 Detection completed. Results saved to '../data/detected_halo_cmes.csv'.")
 else:
     print("\n⚠️ No Halo CME detected in the dataset.")
 
 print("\n✅ Detection completed.")
-
-
-
