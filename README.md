@@ -141,25 +141,6 @@ python scripts/visualization.py
 - Bharat Antriksh Hackathon by ISRO & iHUB DivyaSampark
 
 ---
-
-## � Project Structure
-
-```
-Halo-CME-Detection/
-├── Data/
-│   └── AL1_ASW91_L2_TH1_20250628_UNP_9999_999999_V02.cdf
-├── scripts/
-│   ├── cdf_to_csv.py
-│   ├── data_preparation.py
-│   ├── halo_cme_detection.py
-│   └── visualization.py
-├── main.py
-├── requirements.txt
-├── README.md
-```
-
----
-
 �📈 Future Improvements
 - Add velocity vector direction change analysis
 - Integrate real-time streaming data support
