@@ -38,18 +38,20 @@ Sudden changes in solar wind particle flux can indicate CME activity. Early dete
 
 ## 📁 Project Structure
 
+
 ```
 Halo-CME-Detection/
 ├── Data/
 │   └── AL1_ASW91_L2_TH1_20250628_UNP_9999_999999_V02.cdf   # Example CDF data file
 ├── scripts/
-│   ├── cdf_to_csv.py           # Converts CDF files to CSV
-│   ├── data_preparation.py     # Cleans and merges CSVs into final dataset
-│   ├── halo_cme_detection.py   # Main detection pipeline
-│   └── visualization.py        # Plotting and analysis scripts
-├── main.py                     # (Optional) Entrypoint for running the pipeline
-├── requirements.txt            # Python dependencies
-├── README.md                   # Project documentation
+│   ├── cdf_to_csv.py                 # Converts CDF files to CSV
+│   ├── data_preparation.py           # Cleans and merges CSVs into final dataset
+│   ├── halo_cme_detection.py         # Main detection pipeline
+│   ├── plot_scores.py                # Plots Time vs Composite Score for each CME
+│   └── visualize_with_catalog_overlay.py # Plots composite score with CACTus and detected overlays for all CMEs
+├── main.py                           # (Optional) Entrypoint for running the pipeline
+├── requirements.txt                  # Python dependencies
+├── README.md                         # Project documentation
 ```
 
 **Directory Notes:**
@@ -97,13 +99,14 @@ python scripts/visualization.py
 ## 📊 Output & Visualization
 
 - All plots are saved in the `plots/` directory:
-  - `*_overlay.png`: Composite Score with CACTus intervals
-  - `*_overlay_with_detected.png`: CACTus (orange) vs Detected events (green)
+  - `CME_<number>_composite_score.png`: Time vs Composite Score for each CME (from `plot_scores.py`)
+  - `cme_<number>_overlay_with_detected.png`: Composite Score with CACTus expected interval (orange) and detected events (green) for each CME (from `visualize_with_catalog_overlay.py`)
+  - `*_overlay.png`: (if present) Composite Score with CACTus intervals
   - `cme_strength_distribution.png`: Histogram of CME strengths (Weak/Moderate/Strong)
 
 **Example:**
 
-<p align="center"> <img src="plots/cme_strength_distribution.png" alt="CME Strength Histogram" width="600"/> </p>
+<p align="center"> <img src="plots/cme_12_overlay_with_detected.png" alt="CME 12 Composite Score Overlay" width="800"/> </p>
 
 ---
 
