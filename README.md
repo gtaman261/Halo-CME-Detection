@@ -248,22 +248,11 @@ All plots are now saved in organized subfolders under `plots/`:
 - Bharat Antriksh Hackathon (ISRO & iHUB DivyaSampark) for the challenge framework
 
 ---
-- Add velocity vector direction change analysis
-- Integrate real-time streaming data support
-- Develop a web-based dashboard or alert system
-- Explore machine learning-based trend modeling
 
----
-
-## 📈 Future Improvements & Ideas
-- Add velocity vector direction change analysis
-- Integrate real-time streaming data support
-- Develop a web-based dashboard or alert system
-- Explore machine learning-based trend modeling
-- Add more interactive and comparative visualizations
+## 📈 Future Improvements
+- Incorporate velocity vector direction change analysis
+- Add real-time streaming data support
+- Develop interactive dashboards and advanced comparative visualizations
 - Expand catalog validation and event classification
-- Add velocity vector direction change analysis
-- Integrate real-time streaming data support
-- Develop a web-based dashboard or alert system
-- Explore machine learning-based trend modeling
+- Explore machine learning-based event detection
 
