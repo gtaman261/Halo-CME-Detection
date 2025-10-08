@@ -7,8 +7,8 @@ import os
 from scipy.signal import find_peaks
 
 # Load dataset
-swis_data = pd.read_csv('../data/final_dataset.csv', parse_dates=['Time'])
-catalog = pd.read_csv('../data/cactus/halo_cmes.csv', parse_dates=['Launch_Time', 'Expected_Start', 'Expected_End'])
+swis_data = pd.read_csv('data/final_dataset.csv', parse_dates=['Time'])
+catalog = pd.read_csv('data/cactus/halo_cmes.csv', parse_dates=['Launch_Time', 'Expected_Start', 'Expected_End'])
 
 # Set parameters
 MIN_DURATION = timedelta(minutes=30)

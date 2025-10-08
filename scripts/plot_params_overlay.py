@@ -5,9 +5,9 @@ import os
 import matplotlib.dates as mdates
 
 # Paths
-DETECTED_PATH = '../data/detected_halo_cmes.csv'
-PARAMS_PATH = '../data/final_dataset.csv'  # Use final_dataset.csv as parameter time series
-PLOT_DIR = '../plots/params_overlay'
+DETECTED_PATH = 'data/detected_halo_cmes.csv'
+PARAMS_PATH = 'data/final_dataset.csv'  # Use final_dataset.csv as parameter time series
+PLOT_DIR = 'plots/params_overlay'
 os.makedirs(PLOT_DIR, exist_ok=True)
 
 # Read detected events

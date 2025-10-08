@@ -4,10 +4,10 @@ import os
 
 
 # === CONFIG ===
-DEBUG_DIR = '../data/debug_scores'
-CATALOG_PATH = '../data/cactus/halo_cmes.csv'
-DETECTED_PATH = '../data/detected_halo_cmes.csv'
-PLOT_DIR = '../plots'
+DEBUG_DIR = 'data/debug_scores'
+CATALOG_PATH = 'data/cactus/halo_cmes.csv'
+DETECTED_PATH = 'data/detected_halo_cmes.csv'
+PLOT_DIR = 'plots'
 os.makedirs(PLOT_DIR, exist_ok=True)
 
 

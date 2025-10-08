@@ -5,9 +5,9 @@ import os
 import matplotlib.dates as mdates
 
 # Paths
-PARAMS_PATH = '../data/final_dataset.csv'
-DETECTED_PATH = '../data/detected_halo_cmes.csv'
-PLOT_DIR = '../plots/heatmaps'
+PARAMS_PATH = 'data/final_dataset.csv'
+DETECTED_PATH = 'data/detected_halo_cmes.csv'
+PLOT_DIR = 'plots/heatmaps'
 os.makedirs(PLOT_DIR, exist_ok=True)
 
 # Read parameter time series
